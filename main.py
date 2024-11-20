@@ -10,6 +10,8 @@ clock = pygame.time.Clock()
 
 rect_manager = RectangleManager()
 
+show_bvh = False
+
 loopFinished = False
 while not loopFinished:
     for event in pygame.event.get():
@@ -31,8 +33,10 @@ while not loopFinished:
             if event.key == pygame.K_p:
                 rect_manager.toggle_player()
             if event.key == pygame.K_SPACE:
-                rect_manager.apply_bvh()
-
+                show_bvh = not show_bvh
+                
+    if show_bvh:
+        rect_manager.apply_bvh()
     rect_manager.move()
 
     screen.fill(s.WHITE)
