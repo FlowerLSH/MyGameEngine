@@ -1,3 +1,6 @@
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 960
+
 GRAY         = (100, 100, 100)
 NAVYBLUE     = ( 60,  60, 100)
 WHITE        = (255, 255, 255)
