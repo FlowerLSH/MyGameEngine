@@ -33,7 +33,7 @@ elasticity = 1.0
 # 게임 루프
 loopFinished = False
 while not loopFinished:
-    dt = clock.tick(60) / 1000  # 프레임 간격(초 단위)
+    dt = clock.tick(60) / 500
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             loopFinished = True
@@ -135,6 +135,8 @@ while not loopFinished:
 
         velocity1 = [velocity1_x, velocity1_y]
         velocity2 = [velocity2_x, velocity2_y]
+        print(velocity1)
+        print(velocity2)
 
     # 화면 그리기
     screen.fill(s.WHITE)
