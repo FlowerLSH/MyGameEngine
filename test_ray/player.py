@@ -1,5 +1,6 @@
 import pygame
 import math
+from line import Line
 
 class Player:
     def __init__(self, x, y, angle, size=5, speed=1, rotation_speed=1, vision=60, ray_count=300):
@@ -92,11 +93,9 @@ class Player:
 
         for i in range(self.ray_count):
             ray_angle = start_angle + i * angle_step
-            hit, raw_distance, color = self.cast_ray(ray_angle, walls)
-
-            corrected_distance = raw_distance * math.cos(math.radians(ray_angle - self.angle))
-
-            self.rays.append((hit, corrected_distance, color))
+            ray = Line(self.pos, ray_angle)
+            ray.cast(walls)
+            self.rays.append(ray)
 
     def update(self, walls):
         new_x, new_y = self.handle_input()
@@ -113,30 +112,24 @@ class Player:
         pygame.draw.line(surface, (255, 0, 0), (player_minimap_x, player_minimap_y), (end_x, end_y), 2)
 
     def draw_main(self, screen, width, height):
-        min_distance = 1
         max_distance = 2000
 
-        for i, data in enumerate(self.rays):
-            if not data[0]:
+        for i, ray in enumerate(self.rays):
+            if not ray.hit:
                 continue
 
-            raw_distance = max(data[1], min_distance)
-            ray_angle = self.angle - (self.vision / 2) + (i * (self.vision / self.ray_count))
-
-            angle_offset = math.radians(ray_angle - self.angle)
-            corrected_distance = raw_distance * math.cos(angle_offset)
-
+            corrected_distance = ray.get_corrected_distance(self.angle)
             distance_ratio = corrected_distance / max_distance
             brightness = max(0, min(255, int(255 * (1 - math.sqrt(distance_ratio)))))
 
-            base_color = data[2]
+            base_color = ray.color
             shaded_color = (
                 int(base_color[0] * (brightness / 255)),
                 int(base_color[1] * (brightness / 255)),
-                int(base_color[2] * (brightness / 255))
+                int(base_color[2] * (brightness / 255)),
             )
 
-            line_height = height * 4.5 / raw_distance
+            line_height = height * 4.5 / corrected_distance
             line_width = width / self.ray_count
 
             centerx = width - line_width - (i * line_width)
@@ -147,3 +140,4 @@ class Player:
 
             rect = pygame.Rect(top_left_x, top_left_y, line_width, line_height)
             screen.fill(shaded_color, rect)
+
