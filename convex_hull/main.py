@@ -10,19 +10,19 @@ clock = pygame.time.Clock()
 
 polygon = [(100, 100), (300, 100), (300, 300), (250, 250), (200, 250), (200, 200), (150, 150), (100, 200)]
 
-def cross_product(o, a, b):
+def cross_point(o, a, b):
     return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
 
 def convex_hull(points):
     points = sorted(points)
     lower = []
     for point in points:
-        while len(lower) >= 2 and cross_product(lower[-2], lower[-1], point) <= 0:
+        while len(lower) >= 2 and cross_point(lower[-2], lower[-1], point) <= 0:
             lower.pop()
         lower.append(point)
     upper = []
     for point in reversed(points):
-        while len(upper) >= 2 and cross_product(upper[-2], upper[-1], point) <= 0:
+        while len(upper) >= 2 and cross_point(upper[-2], upper[-1], point) <= 0:
             upper.pop()
         upper.append(point)
     return lower[:-1] + upper[:-1]

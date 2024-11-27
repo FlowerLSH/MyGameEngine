@@ -6,15 +6,8 @@ pygame.init()
 
 screen_width, screen_height = 800, 600
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Concave")
+pygame.display.set_caption("concave")
 clock = pygame.time.Clock()
-
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
-GREEN = (0, 255, 0)
-YELLOW = (255, 255, 0)
 
 polygon1 = [(200, 200), (300, 150), (400, 200), (350, 300), (250, 300)]
 polygon2 = [(300, 250), (450, 250), (450, 400), (350, 350), (300, 400)]
@@ -99,27 +92,27 @@ while running:
             if collision_detected:
                 collision_triangles.append((t1, t2))
 
-    screen.fill(WHITE)
+    screen.fill((255, 255, 255))
 
     if show_triangles:
         drawn_lines = set()
         for triangle in triangles1:
-            color = GREEN if any(triangle == t1 for t1, _ in collision_triangles) else RED
+            color = (0, 255, 0) if any(triangle == t1 for t1, _ in collision_triangles) else (255, 0, 0)
             pygame.draw.polygon(screen, color, triangle, 1)
 
         for triangle in triangles2:
-            color = GREEN if any(triangle == t2 for _, t2 in collision_triangles) else RED
+            color = (0, 255, 0) if any(triangle == t2 for _, t2 in collision_triangles) else (255, 0, 0)
             pygame.draw.polygon(screen, color, triangle, 1)
     else:
-        polygon1_color = BLUE if any(t1 for t1, _ in collision_triangles) else RED
-        polygon2_color = BLUE if any(t2 for _, t2 in collision_triangles) else RED
+        polygon1_color = (0, 0, 255) if any(t1 for t1, _ in collision_triangles) else (255, 0, 0)
+        polygon2_color = (0, 0, 255) if any(t2 for _, t2 in collision_triangles) else (255, 0, 0)
 
         pygame.draw.polygon(screen, polygon1_color, polygon1, 2)
         pygame.draw.polygon(screen, polygon2_color, polygon2, 2)
 
     collision_text = f"Collision: {'Yes' if collision_triangles else 'No'}"
     font = pygame.font.Font(None, 36)
-    text_surface = font.render(collision_text, True, BLACK)
+    text_surface = font.render(collision_text, True, (0, 0, 0))
     screen.blit(text_surface, (10, 10))
 
     pygame.display.flip()
