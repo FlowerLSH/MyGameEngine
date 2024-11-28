@@ -110,10 +110,6 @@ while running:
         pygame.draw.polygon(screen, polygon1_color, polygon1, 2)
         pygame.draw.polygon(screen, polygon2_color, polygon2, 2)
 
-    collision_text = f"Collision: {'Yes' if collision_triangles else 'No'}"
-    font = pygame.font.Font(None, 36)
-    text_surface = font.render(collision_text, True, (0, 0, 0))
-    screen.blit(text_surface, (10, 10))
 
     pygame.display.flip()
     clock.tick(60)
