@@ -46,10 +46,16 @@ class Circle:
         overlap = self.radius + other.radius - distance
         nx, ny = dx / distance, dy / distance
 
-        self.vx += nx * overlap * elastic
-        self.vy += ny * overlap * elastic
-        other.vx -= nx * overlap * elastic
-        other.vy -= ny * overlap * elastic
+        if elastic == 0:
+            self.x += nx * overlap * 0.5
+            self.y += ny * overlap * 0.5
+            other.x -= nx * overlap * 0.5
+            other.y -= ny * overlap * 0.5
+        else:
+            self.vx += nx * overlap * elastic
+            self.vy += ny * overlap * elastic
+            other.vx -= nx * overlap * elastic
+            other.vy -= ny * overlap * elastic
 
 
 class CircleManager:
@@ -87,4 +93,4 @@ class CircleManager:
             circle.draw(surface)
 
     def adjust_elastic(self, delta):
-        self.elastic = max(0.1, min(1, self.elastic + delta))
+        self.elastic = max(0, min(1, self.elastic + delta))

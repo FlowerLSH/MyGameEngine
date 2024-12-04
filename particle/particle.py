@@ -24,10 +24,11 @@ class Particle:
             pygame.draw.circle(surface, self.color, (int(self.x), int(self.y)), int(self.size))
 
 class Explosion:
-    def __init__(self, x, y, num_particles):
+    def __init__(self, x, y, num_particles, power=1.0):
         self.x = x
         self.y = y
         self.particles = [Particle(x, y) for _ in range(num_particles)]
+        self.power = power
 
     def update(self):
         for particle in self.particles:
@@ -45,8 +46,9 @@ class Explosion:
             dx = circle.x - self.x
             dy = circle.y - self.y
             distance = math.sqrt(dx**2 + dy**2)
-            if distance < 200 and distance > 0:
-                force_magnitude = 100 / max(distance, 1)
-                force_x = (dx / distance) * force_magnitude
-                force_y = (dy / distance) * force_magnitude
-                circle.apply_force(force_x, force_y)
+            max_distance = 200 * self.power
+            if distance < max_distance and distance > 0:
+                force_magnitude = (100 * self.power) / distance
+                fx = (dx / distance) * force_magnitude
+                fy = (dy / distance) * force_magnitude
+                circle.apply_force(fx, fy)
