@@ -86,10 +86,7 @@ def SAT_detect_collision(poly1, poly2):
             return False
     return True
 
-
 def collision_detection_concave(poly1, poly2):
-    # poly1과 poly2의 꼭짓점들은 반시계방향으로 정렬되어 있다고 가정
-
     triangles1 = ear_clipping_algorithm(poly1)
     triangles2 = ear_clipping_algorithm(poly2)
 

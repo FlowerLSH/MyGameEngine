@@ -1,6 +1,7 @@
 import pygame
 import concave
 import math
+import convex_hull
 
 pygame.init()
 
@@ -9,8 +10,16 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("concave")
 clock = pygame.time.Clock()
 
-polygon1 = [(200, 200), (300, 150), (400, 200), (350, 300), (250, 300)]
-polygon2 = [(300, 250), (450, 250), (450, 400), (350, 350), (300, 400)]
+polygon1 = [
+    (150, 250), (200, 150), (250, 250), (350, 200), (300, 300),
+    (400, 350), (250, 350), (200, 450), (150, 350), (50, 300)
+]
+
+polygon2 = [
+    (400, 400), (500, 350), (550, 450), (500, 500), (600, 550),
+    (500, 600), (450, 650), (400, 550), (350, 500), (300, 400)
+]
+
 
 rotation_speed = 3
 
@@ -38,6 +47,7 @@ def get_polygon_center(polygon):
 current_angle = 0
 rotation_direction = 0
 show_triangles = False
+show_convex_hull = False
 
 running = True
 while running:
@@ -49,6 +59,8 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 show_triangles = not show_triangles
+            elif event.key == pygame.K_LCTRL:
+                show_convex_hull = not show_convex_hull
 
     keys = pygame.key.get_pressed()
     dx, dy = 0, 0
@@ -74,23 +86,28 @@ while running:
     current_angle += rotation_speed * rotation_direction
     polygon2 = rotate_polygon(polygon2, rotation_speed * rotation_direction, center2)
 
+    polygon1_convex_hull = convex_hull.convex_hull(polygon1)
+    polygon2_convex_hull = convex_hull.convex_hull(polygon2)
+
     triangles1 = concave.ear_clipping_algorithm(polygon1)
     triangles2 = concave.ear_clipping_algorithm(polygon2)
 
     collision_triangles = []
-    for t1 in triangles1:
-        for t2 in triangles2:
-            axes1 = concave.get_axes(t1)
-            axes2 = concave.get_axes(t2)
-            collision_detected = True
-            for axis in axes1 + axes2:
-                poly1_min, poly1_max = concave.project_polygon(axis, t1)
-                poly2_min, poly2_max = concave.project_polygon(axis, t2)
-                if poly1_max < poly2_min or poly2_max < poly1_min:
-                    collision_detected = False
-                    break
-            if collision_detected:
-                collision_triangles.append((t1, t2))
+
+    if concave.SAT_detect_collision(polygon1, polygon2):
+        for t1 in triangles1:
+            for t2 in triangles2:
+                axes1 = concave.get_axes(t1)
+                axes2 = concave.get_axes(t2)
+                collision_detected = True
+                for axis in axes1 + axes2:
+                    poly1_min, poly1_max = concave.project_polygon(axis, t1)
+                    poly2_min, poly2_max = concave.project_polygon(axis, t2)
+                    if poly1_max < poly2_min or poly2_max < poly1_min:
+                        collision_detected = False
+                        break
+                if collision_detected:
+                    collision_triangles.append((t1, t2))
 
     screen.fill((255, 255, 255))
 
@@ -109,6 +126,10 @@ while running:
 
         pygame.draw.polygon(screen, polygon1_color, polygon1, 2)
         pygame.draw.polygon(screen, polygon2_color, polygon2, 2)
+
+    if show_convex_hull:
+        pygame.draw.polygon(screen, (0, 0, 0), polygon1_convex_hull, 2)
+        pygame.draw.polygon(screen, (0, 0, 0), polygon2_convex_hull, 2)
 
 
     pygame.display.flip()
