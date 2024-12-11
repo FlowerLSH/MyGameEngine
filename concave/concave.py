@@ -3,59 +3,43 @@ import math
 def cross(v1, v2):
     return v1[0] * v2[1] - v1[1] * v2[0]
 
-def is_point_in_triangle(p, a, b, c):
-    pa = (a[0] - p[0], a[1] - p[1])
-    pb = (b[0] - p[0], b[1] - p[1])
-    pc = (c[0] - p[0], c[1] - p[1])
+def point_in_triangle(point, p1, p2, p3):
+    v1 = (p1[0] - point[0], p1[1] - point[1])
+    v2 = (p2[0] - point[0], p2[1] - point[1])
+    v3 = (p3[0] - point[0], p3[1] - point[1])
 
-    d1 = cross(pa, pb)
-    d2 = cross(pb, pc)
-    d3 = cross(pc, pa)
+    flag1 = cross(v1, v2)
+    flag2 = cross(v2, v3)
+    flag3 = cross(v3, v1)
 
-    neg = (d1 < 0) or (d2 < 0) or (d3 < 0)
-    pos = (d1 > 0) or (d2 > 0) or (d3 > 0)
+    return not ((flag1 < 0) or (flag2 < 0) or (flag3 < 0)) and ((flag1 > 0) or (flag2 > 0) or (flag3 > 0))
 
-    check = not (neg and pos)
+def ear(vertices, vertice1, vertice2, vertice3):
+    if cross((vertice2[0] - vertice1[0], vertice2[1] - vertice1[1]), (vertice3[0] - vertice1[0], vertice3[1] - vertice1[1])) > 0:
+        for p in vertices:
+            if p not in (vertice1, vertice2, vertice3):
+                if point_in_triangle(p, vertice1, vertice2, vertice3):
+                    return False
+        return True
+    return False
 
-    return check
-
-
-def is_ear(polygon, i):
-    prev = polygon[i - 1]
-    curr = polygon[i]
-    next = polygon[(i + 1) % len(polygon)]
-
-    v1 = (curr[0] - prev[0], curr[1] - prev[1])
-    v2 = (next[0] - prev[0], next[1] - prev[1])
-
-    if cross(v1, v2) <= 0:
-        return False
     
-    for point in polygon:
-        if point != prev and point != curr and point != next:
-            if is_point_in_triangle(point, prev, curr, next):
-                return False
-    
-    return True
+def ear_clipping_algorithm(vertices):
+    result = []
+    temp = vertices[:]
 
+    while len(temp) > 3:
+        for i in range(len(temp)):
+            vertice1 = temp[i - 1]
+            vertice2 = temp[i]
+            vertice3 = temp[(i + 1) % len(temp)]
+            if ear(vertices, vertice1, vertice2, vertice3):
+                result.append((vertice1, vertice2, vertice3))
+                del temp[i]
 
-def ear_clipping_algorithm(polygon):
-    triangles = []
-    polygon = polygon[:]
-
-    while len(polygon) > 3:
-        for i in range(len(polygon)):
-            if is_ear(polygon, i):
-                prev = polygon[i - 1]
-                curr = polygon[i]
-                next = polygon[(i + 1) % len(polygon)]
-                triangles.append((prev, curr, next))
-
-                del polygon[i]
                 break
-
-    triangles.append((polygon[0], polygon[1], polygon[2]))
-    return triangles
+    result.append((temp[0], temp[1], temp[2]))
+    return result
 
 def project_polygon(axis, points):
     project = [axis[0] * point[0] + axis[1] * point[1] for point in points]
@@ -95,6 +79,3 @@ def collision_detection_concave(poly1, poly2):
             if SAT_detect_collision(triangle1, triangle2):
                 return True
     return False
-
-    
-

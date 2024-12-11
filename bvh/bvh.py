@@ -2,6 +2,7 @@ import pygame
 import calc
 import settings as s
 
+
 class BVHNode:
     def __init__(self, bounds, left=None, right=None):
         self.bounds = bounds

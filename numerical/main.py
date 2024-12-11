@@ -125,11 +125,11 @@ while not loopFinished:
     if trail_verlet:
         pygame.draw.circle(screen, (0, 0, 255), trail_verlet[-1], 5)
 
-    if len(trail_analystic) > 1:
-        pygame.draw.lines(screen, (0, 255, 0), False, trail_analystic, 2)
+    # if len(trail_analystic) > 1:
+    #     pygame.draw.lines(screen, (0, 255, 0), False, trail_analystic, 2)
 
-    if trail_analystic:
-        pygame.draw.circle(screen, (0, 255, 0), trail_analystic[-1], 5)
+    # if trail_analystic:
+    #     pygame.draw.circle(screen, (0, 255, 0), trail_analystic[-1], 5)
 
     pygame.display.flip()
     clock.tick(60)
