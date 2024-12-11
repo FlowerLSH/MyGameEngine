@@ -1,6 +1,7 @@
 import pygame
 import calc
 import settings as s
+import heapq
 
 
 class BVHNode:
@@ -14,32 +15,32 @@ class BVHNode:
         if self.is_leaf:
             self.rectangles = [bounds]
 
-    @staticmethod
     def create_hierarchy(rectangles):
-        if len(rectangles) == 1:
-            node = BVHNode(rectangles[0])
-            node.rectangles = [rectangles[0]]
-            return node
-
         nodes = [BVHNode(rect) for rect in rectangles]
+
+        heap = []
+        for i in range(len(nodes)):
+            for j in range(i + 1, len(nodes)):
+                distance = calc.get_distance(nodes[i].bounds, nodes[j].bounds)
+                heapq.heappush(heap, (distance, i, j))
+        
         while len(nodes) > 1:
-            min_distance = float('inf')
-            pair = None
+            distance, i, j = heapq.heappop(heap)
+            
+            try:
+                outline = calc.get_outline(nodes[i].bounds, nodes[j].bounds)
+            except:
+                continue
+            new = BVHNode(outline, nodes[i], nodes[j])
 
-            for i in range(len(nodes)):
-                for j in range(i + 1, len(nodes)):
-                    distance = calc.get_distance(nodes[i].bounds, nodes[j].bounds)
-                    if distance < min_distance:
-                        min_distance = distance
-                        pair = (i, j)
-
-            i, j = pair
-            merged_bounds = calc.get_outline(nodes[i].bounds, nodes[j].bounds)
-            new_node = BVHNode(merged_bounds, nodes[i], nodes[j])
+            nodes.append(new)
 
             del nodes[j]
             del nodes[i]
-            nodes.append(new_node)
+
+            for i in range(len(nodes) - 1):
+                distance = calc.get_distance(nodes[i].bounds, new.bounds)
+                heapq.heappush(heap, (distance, i, len(nodes) - 1))
 
         return nodes[0]
 
