@@ -94,7 +94,7 @@ while running:
 
     collision_triangles = []
 
-    if concave.SAT_detect_collision(polygon1, polygon2):
+    if concave.SAT_detect_collision(polygon1_convex_hull, polygon2_convex_hull):
         for t1 in triangles1:
             for t2 in triangles2:
                 axes1 = concave.get_axes(t1)
