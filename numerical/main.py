@@ -51,7 +51,7 @@ for i in range(count):
 
 t0 = 0.0
 position_current = position.copy()
-past_position = position - velocity * dt
+past_position = analytic(-dt)
 for i in range(count):
     save_verlet.append(position_current)
     future_position = verlet_integration(position_current, past_position, a(t0, position_current))
@@ -89,10 +89,15 @@ count_index = 0
 
 loopFinished = False
 
+font = pygame.font.Font(None, 36)
+
+
+
 while not loopFinished:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             loopFinished = True
+
 
     screen.fill((255, 255, 255))
 
@@ -110,6 +115,18 @@ while not loopFinished:
         x, y = save_analytic[count_index]
         particle_pos = (int(x * scale), int(height - y * scale))
         trail_analystic.append(particle_pos)
+
+    
+    error_rk4 = [0, 0]
+    error_verlet = [0, 0]
+
+    for i in range(len(trail_rk4)):
+        error_rk4[0] += (trail_analystic[i][0] - trail_rk4[i][0])
+        error_rk4[1] += (trail_analystic[i][1] - trail_rk4[i][1])
+
+    for i in range(len(trail_verlet)):
+        error_verlet[0] += (trail_analystic[i][0] - trail_verlet[i][0])
+        error_verlet[1] += (trail_analystic[i][1] - trail_verlet[i][1])
 
     count_index += 1
 
@@ -130,6 +147,12 @@ while not loopFinished:
 
     if trail_analystic:
         pygame.draw.circle(screen, (0, 255, 0), trail_analystic[-1], 5)
+
+    error_rk4_text = font.render(f"Error RK4: {error_rk4}", True, (0, 0, 0))
+    error_verlet_text = font.render(f"Error Verlet: {error_verlet}", True, (0, 0, 0))
+
+    screen.blit(error_rk4_text, (10, 10))
+    screen.blit(error_verlet_text, (10, 50))
 
     pygame.display.flip()
     clock.tick(60)
